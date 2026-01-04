@@ -1,64 +1,117 @@
-import { format, isToday, isYesterday, startOfDay, differenceInDays } from 'date-fns'
+import { format, isToday, isYesterday, startOfDay, differenceInDays, subDays, parseISO } from 'date-fns'
 
+// Get user's timezone offset
+export const getUserTimezoneOffset = () => {
+  return new Date().getTimezoneOffset()
+}
+
+// Get today's date string in user's local timezone
+export const getTodayString = () => {
+  const now = new Date()
+  return format(now, 'yyyy-MM-dd')
+}
+
+// Get yesterday's date string in user's local timezone
+export const getYesterdayString = () => {
+  const yesterday = subDays(new Date(), 1)
+  return format(yesterday, 'yyyy-MM-dd')
+}
+
+// Format date
 export const formatDate = (date) => format(date, 'yyyy-MM-dd')
 
 export const isDateToday = (date) => isToday(new Date(date))
 
 export const isDateYesterday = (date) => isYesterday(new Date(date))
 
-export const getTodayString = () => formatDate(new Date())
+// Get date range for history view
+export const getDateRange = (days) => {
+  const dates = []
+  const today = new Date()
+  
+  for (let i = days - 1; i >= 0; i--) {
+    const date = subDays(today, i)
+    dates.push(format(date, 'yyyy-MM-dd'))
+  }
+  
+  return dates
+}
 
-export const getYesterdayString = () => formatDate(new Date(Date.now() - 24 * 60 * 60 * 1000))
-
+// Enhanced streak calculation
 export const calculateStreak = (taskLogs) => {
   if (!taskLogs || taskLogs.length === 0) return { current: 0, longest: 0 }
 
-  const sortedLogs = taskLogs
+  const completedLogs = taskLogs
     .filter(log => log.completed)
     .sort((a, b) => new Date(b.date) - new Date(a.date))
 
-  if (sortedLogs.length === 0) return { current: 0, longest: 0 }
+  if (completedLogs.length === 0) return { current: 0, longest: 0 }
 
+  const today = getTodayString()
+  const yesterday = getYesterdayString()
+  
   let currentStreak = 0
   let longestStreak = 0
-  let tempStreak = 0
   
-  const today = startOfDay(new Date())
-  let expectedDate = today
-
   // Calculate current streak
-  for (const log of sortedLogs) {
-    const logDate = startOfDay(new Date(log.date))
-    const daysDiff = differenceInDays(expectedDate, logDate)
+  const mostRecentLog = completedLogs[0]
+  if (mostRecentLog.date === today || mostRecentLog.date === yesterday) {
+    let streakDate = mostRecentLog.date
     
-    if (daysDiff === 0) {
-      currentStreak++
-      expectedDate = new Date(expectedDate.getTime() - 24 * 60 * 60 * 1000)
-    } else if (daysDiff === 1 && currentStreak === 0) {
-      // Allow for today not being completed yet
-      expectedDate = logDate
-      currentStreak++
-      expectedDate = new Date(expectedDate.getTime() - 24 * 60 * 60 * 1000)
-    } else {
-      break
+    for (const log of completedLogs) {
+      if (log.date === streakDate) {
+        currentStreak++
+        // Move to previous day
+        const currentDate = parseISO(streakDate)
+        const prevDate = subDays(currentDate, 1)
+        streakDate = format(prevDate, 'yyyy-MM-dd')
+      } else {
+        break
+      }
     }
   }
-
+  
   // Calculate longest streak
-  let consecutiveDays = 1
-  for (let i = 0; i < sortedLogs.length - 1; i++) {
-    const currentDate = new Date(sortedLogs[i].date)
-    const nextDate = new Date(sortedLogs[i + 1].date)
+  let tempStreak = 1
+  for (let i = 0; i < completedLogs.length - 1; i++) {
+    const currentDate = parseISO(completedLogs[i].date)
+    const nextDate = parseISO(completedLogs[i + 1].date)
     const daysDiff = differenceInDays(currentDate, nextDate)
     
     if (daysDiff === 1) {
-      consecutiveDays++
+      tempStreak++
     } else {
-      longestStreak = Math.max(longestStreak, consecutiveDays)
-      consecutiveDays = 1
+      longestStreak = Math.max(longestStreak, tempStreak)
+      tempStreak = 1
     }
   }
-  longestStreak = Math.max(longestStreak, consecutiveDays)
+  longestStreak = Math.max(longestStreak, tempStreak)
 
   return { current: currentStreak, longest: longestStreak }
+}
+
+// Check if it's a new day since last check
+export const isNewDay = (lastCheckDate) => {
+  if (!lastCheckDate) return true
+  const today = getTodayString()
+  return lastCheckDate !== today
+}
+
+// Format date for display
+export const formatDisplayDate = (dateString) => {
+  const date = parseISO(dateString)
+  return format(date, 'MMM d')
+}
+
+// Get day name
+export const getDayName = (dateString) => {
+  const date = parseISO(dateString)
+  return format(date, 'EEE')
+}
+
+// Check if date is within last N days
+export const isWithinLastDays = (dateString, days) => {
+  const date = parseISO(dateString)
+  const cutoffDate = subDays(new Date(), days)
+  return date >= cutoffDate
 }

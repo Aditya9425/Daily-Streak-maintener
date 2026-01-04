@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { TasksProvider } from './context/TasksContext'
 import Auth from './pages/Auth'
-import Dashboard from './pages/Dashboard'
+import DashboardClean from './pages/DashboardClean'
 import EmailVerification from './pages/EmailVerification'
 import LoadingSpinner from './components/LoadingSpinner'
 
@@ -53,7 +53,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <TasksProvider>
-                    <Dashboard />
+                    <DashboardClean />
                   </TasksProvider>
                 </ProtectedRoute>
               } 

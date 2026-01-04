@@ -9,8 +9,22 @@
 }
 
 @layer components {
+  /* Consistent card styling */
+  .card {
+    @apply bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl;
+  }
+  
+  .card-hover {
+    @apply hover:bg-white/10 transition-all duration-300;
+  }
+  
+  .card-padding {
+    @apply p-6;
+  }
+  
+  /* Remove old glass classes for consistency */
   .glass {
-    @apply bg-white/5 backdrop-blur-md border border-white/10;
+    @apply bg-white/5 backdrop-blur-sm border border-white/10;
   }
   
   .glass-hover {
@@ -18,14 +32,6 @@
   }
   
   .glass-card {
-    @apply glass rounded-2xl p-6 shadow-2xl;
-  }
-  
-  .gradient-border {
-    @apply relative before:absolute before:inset-0 before:p-[1px] before:bg-gradient-to-r before:from-white/20 before:to-white/5 before:rounded-2xl before:content-[''];
-  }
-  
-  .gradient-border > * {
-    @apply relative bg-black rounded-2xl;
+    @apply glass rounded-2xl p-6;
   }
 }
