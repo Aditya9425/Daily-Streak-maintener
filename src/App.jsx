@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { TasksProvider } from './context/TasksContext'
 import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
+import EmailVerification from './pages/EmailVerification'
 import LoadingSpinner from './components/LoadingSpinner'
 
 const ProtectedRoute = ({ children }) => {
@@ -57,6 +58,7 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route path="/verify" element={<EmailVerification />} />
             <Route path="/" element={<Navigate to="/dashboard" />} />
           </Routes>
         </div>
