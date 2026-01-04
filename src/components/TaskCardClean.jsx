@@ -19,30 +19,30 @@ const TaskCard = ({ task, index }) => {
       transition={{ delay: index * 0.1 }}
       className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         {/* Left: Task Info */}
-        <div className="flex items-center gap-4 flex-1">
-          <div className="text-2xl">{task.icon}</div>
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="text-2xl flex-shrink-0">{task.icon}</div>
           
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-white mb-1">{task.name}</h3>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-semibold text-white mb-1 truncate">{task.name}</h3>
             {task.description && (
-              <p className="text-sm text-white/60">{task.description}</p>
+              <p className="text-sm text-white/60 truncate">{task.description}</p>
             )}
           </div>
         </div>
 
         {/* Center: Streak Info */}
-        <div className="flex items-center gap-6 mx-6">
+        <div className="flex items-center gap-4 flex-shrink-0">
           <div className="text-center">
-            <div className="text-xl font-bold text-white">{streak.current}</div>
+            <div className="text-lg font-bold text-white">{streak.current}</div>
             <div className="text-xs text-white/60">Current</div>
           </div>
           
-          <div className="w-px h-8 bg-white/20"></div>
+          <div className="w-px h-6 bg-white/20"></div>
           
           <div className="text-center">
-            <div className="text-xl font-bold text-white/80">{streak.longest}</div>
+            <div className="text-lg font-bold text-white/80">{streak.longest}</div>
             <div className="text-xs text-white/60">Best</div>
           </div>
         </div>
@@ -50,7 +50,7 @@ const TaskCard = ({ task, index }) => {
         {/* Right: Checkbox */}
         <motion.button
           onClick={handleToggle}
-          className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+          className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
             isCompleted
               ? 'bg-white border-white text-black'
               : 'border-white/30 hover:border-white/60'

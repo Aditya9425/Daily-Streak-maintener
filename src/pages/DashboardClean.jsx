@@ -3,13 +3,16 @@ import { motion } from 'framer-motion'
 import { LogOut, RefreshCw, Settings as SettingsIcon } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useTasks } from '../context/TasksContext'
+import { AIProvider } from '../context/AIContext'
 import TaskCardClean from '../components/TaskCardClean'
 import ProgressRing from '../components/ProgressRing'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Settings from '../components/Settings'
+import AIDailyCoach from '../components/AIDailyCoach'
+import AIWeeklyReview from '../components/AIWeeklyReview'
 import { getDailyQuote } from '../utils/quotes'
 
-const Dashboard = () => {
+const DashboardContent = () => {
   const { user, signOut } = useAuth()
   const { tasks, loading, getDailyProgress, refreshData } = useTasks()
   const [showSettings, setShowSettings] = useState(false)
@@ -66,7 +69,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Top Cards Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* Daily Progress */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -84,18 +87,24 @@ const Dashboard = () => {
             </ProgressRing>
             
             <div className="mt-6 text-white/60">
-              {tasks.filter(task => {
-                const { getTaskStatus } = useTasks()
-                return getTaskStatus(task.task_id)
-              }).length} of {tasks.length} tasks completed
+              {Math.round((dailyProgress / 100) * tasks.length)} of {tasks.length} tasks completed
             </div>
+          </motion.div>
+
+          {/* AI Daily Coach */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <AIDailyCoach />
           </motion.div>
 
           {/* Daily Quote */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.3 }}
             className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 flex flex-col justify-center"
           >
             <div className="text-center">
@@ -108,11 +117,21 @@ const Dashboard = () => {
           </motion.div>
         </div>
 
+        {/* Weekly Review */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mb-8"
+        >
+          <AIWeeklyReview />
+        </motion.div>
+
         {/* Tasks Section */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.5 }}
         >
           <h2 className="text-2xl font-semibold text-white mb-6">Your Tasks</h2>
           
@@ -148,6 +167,14 @@ const Dashboard = () => {
       
       <Settings isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </div>
+  )
+}
+
+const Dashboard = () => {
+  return (
+    <AIProvider>
+      <DashboardContent />
+    </AIProvider>
   )
 }
 
