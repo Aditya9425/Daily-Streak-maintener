@@ -1,14 +1,18 @@
 import { motion } from 'framer-motion'
-import { LogOut, RefreshCw } from 'lucide-react'
+import { LogOut, RefreshCw, Settings } from 'lucide-react'
+import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useTasks } from '../context/TasksContext'
 import TaskCard from '../components/TaskCard'
 import ProgressRing from '../components/ProgressRing'
 import LoadingSpinner from '../components/LoadingSpinner'
+import SettingsModal from '../components/Settings'
+import AIDailyCoach from '../components/AIDailyCoach'
 
 const Dashboard = () => {
   const { user, signOut } = useAuth()
   const { tasks, loading, getDailyProgress, refreshData } = useTasks()
+  const [showSettings, setShowSettings] = useState(false)
 
   const dailyProgress = getDailyProgress()
 
@@ -47,6 +51,15 @@ const Dashboard = () => {
           </div>
           
           <div className="flex items-center gap-3">
+            <motion.button
+              onClick={() => setShowSettings(true)}
+              className="p-3 glass rounded-xl glass-hover"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Settings size={20} />
+            </motion.button>
+            
             <motion.button
               onClick={handleRefresh}
               className="p-3 glass rounded-xl glass-hover"
@@ -88,6 +101,16 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
+        {/* AI Coach */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-8"
+        >
+          <AIDailyCoach />
+        </motion.div>
+
         {/* Tasks Grid */}
         <div className="grid gap-4 md:gap-6">
           {tasks.map((task, index) => (
@@ -111,6 +134,12 @@ const Dashboard = () => {
           </motion.div>
         )}
       </div>
+
+      {/* Settings Modal */}
+      <SettingsModal 
+        isOpen={showSettings} 
+        onClose={() => setShowSettings(false)} 
+      />
     </div>
   )
 }

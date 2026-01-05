@@ -11,14 +11,18 @@ import Settings from '../components/Settings'
 import AIDailyCoach from '../components/AIDailyCoach'
 import AIWeeklyReview from '../components/AIWeeklyReview'
 import { getDailyQuote } from '../utils/quotes'
+import { getTodayString, formatDisplayDate } from '../utils/dateUtils'
 
 const DashboardContent = () => {
   const { user, signOut } = useAuth()
-  const { tasks, loading, getDailyProgress, refreshData } = useTasks()
+  const { tasks, loading, analyticsService, selectedDate, refreshData } = useTasks()
   const [showSettings, setShowSettings] = useState(false)
   
-  const dailyProgress = getDailyProgress()
+  // Use analytics service for consistent data
+  const todayStats = analyticsService ? analyticsService.getTodayStats() : { completionPercentage: 0, completedCount: 0, totalTasks: 0 }
   const quote = getDailyQuote()
+  const today = getTodayString()
+  const isViewingToday = selectedDate === today
 
   if (loading) {
     return (
@@ -39,10 +43,13 @@ const DashboardContent = () => {
         >
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-              Daily Streaks
+              {isViewingToday ? 'Daily Streaks' : `Daily Streaks - ${formatDisplayDate(selectedDate)}`}
             </h1>
             <p className="text-white/60">
-              Welcome back, {user?.email?.split('@')[0]}
+              {isViewingToday 
+                ? `Welcome back, ${user?.email?.split('@')[0]}` 
+                : `Viewing ${formatDisplayDate(selectedDate)} (Read-only)`
+              }
             </p>
           </div>
           
@@ -77,17 +84,19 @@ const DashboardContent = () => {
             transition={{ delay: 0.1 }}
             className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center"
           >
-            <h2 className="text-xl font-semibold text-white mb-6">Today's Progress</h2>
+            <h2 className="text-xl font-semibold text-white mb-6">
+              {isViewingToday ? "Today's Progress" : `Progress for ${formatDisplayDate(selectedDate)}`}
+            </h2>
             
-            <ProgressRing progress={dailyProgress} size={120}>
+            <ProgressRing progress={todayStats.completionPercentage} size={120}>
               <div className="text-center">
-                <div className="text-3xl font-bold text-white">{dailyProgress}%</div>
+                <div className="text-3xl font-bold text-white">{todayStats.completionPercentage}%</div>
                 <div className="text-white/60 text-sm">Complete</div>
               </div>
             </ProgressRing>
             
             <div className="mt-6 text-white/60">
-              {Math.round((dailyProgress / 100) * tasks.length)} of {tasks.length} tasks completed
+              {todayStats.completedCount} of {todayStats.totalTasks} tasks completed
             </div>
           </motion.div>
 

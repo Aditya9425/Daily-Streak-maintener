@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Plus, Trash2, AlertTriangle } from 'lucide-react'
+import { X, Plus, Trash2, AlertTriangle, Calendar as CalendarIcon, Settings as SettingsIcon, Flame } from 'lucide-react'
 import { useTasks } from '../context/TasksContext'
+import Calendar from './Calendar'
 
 const EMOJI_OPTIONS = [
   '📚', '💻', '🏃', '🎯', '🎨', '🎵', '📝', '🧘', 
@@ -9,8 +10,8 @@ const EMOJI_OPTIONS = [
 ]
 
 const Settings = ({ isOpen, onClose }) => {
-  const { tasks, addCustomTask, deleteTask } = useTasks()
-  const [activeTab, setActiveTab] = useState('manage')
+  const { tasks, addCustomTask, deleteTask, getTaskStreak } = useTasks()
+  const [activeTab, setActiveTab] = useState('calendar')
   const [showAddTask, setShowAddTask] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null)
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
@@ -76,53 +77,139 @@ const Settings = ({ isOpen, onClose }) => {
 
           {/* Content */}
           <div className="p-6 overflow-y-auto max-h-[60vh]">
-            {/* Manage Tasks Section */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-white">Manage Tasks</h3>
-                <button
-                  onClick={() => setShowAddTask(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-xl hover:bg-gray-200 transition-colors"
-                >
-                  <Plus size={16} />
-                  Add Task
-                </button>
-              </div>
+            {/* Tab Navigation */}
+            <div className="flex gap-2 mb-6 p-1 bg-white/5 rounded-xl">
+              <button
+                onClick={() => setActiveTab('calendar')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  activeTab === 'calendar' 
+                    ? 'bg-white text-black' 
+                    : 'text-white hover:bg-white/10'
+                }`}
+              >
+                <CalendarIcon size={16} />
+                Calendar
+              </button>
+              <button
+                onClick={() => setActiveTab('streaks')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  activeTab === 'streaks' 
+                    ? 'bg-white text-black' 
+                    : 'text-white hover:bg-white/10'
+                }`}
+              >
+                <Flame size={16} />
+                Streaks
+              </button>
+              <button
+                onClick={() => setActiveTab('manage')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  activeTab === 'manage' 
+                    ? 'bg-white text-black' 
+                    : 'text-white hover:bg-white/10'
+                }`}
+              >
+                <SettingsIcon size={16} />
+                Manage
+              </button>
+            </div>
 
-              {/* Task List */}
-              <div className="space-y-3">
-                {tasks.map((task) => (
-                  <div
-                    key={task.task_id}
-                    className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{task.icon}</span>
-                      <div>
-                        <h4 className="font-medium text-white">{task.name}</h4>
-                        {task.description && (
-                          <p className="text-sm text-white/60">{task.description}</p>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <button
-                      onClick={() => setShowDeleteConfirm(task)}
-                      className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+            {/* Calendar Tab */}
+            {activeTab === 'calendar' && (
+              <Calendar />
+            )}
+
+            {/* Streaks Tab */}
+            {activeTab === 'streaks' && (
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-white mb-4">Task Streaks</h3>
+                
+                {tasks.length > 0 ? (
+                  <div className="space-y-3">
+                    {tasks.map((task) => {
+                      const streak = getTaskStreak(task.task_id)
+                      return (
+                        <div
+                          key={task.task_id}
+                          className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{task.icon}</span>
+                            <div>
+                              <h4 className="font-medium text-white">{task.name}</h4>
+                              {task.description && (
+                                <p className="text-sm text-white/60">{task.description}</p>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 text-orange-400">
+                            <Flame size={20} />
+                            <span className="text-lg font-bold">{streak.current}</span>
+                            <span className="text-sm text-white/60">days</span>
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
-                ))}
-
-                {tasks.length === 0 && (
+                ) : (
                   <div className="text-center py-8 text-white/60">
-                    <div className="text-4xl mb-2">📝</div>
-                    <p>No tasks yet. Add your first task to get started!</p>
+                    <div className="text-4xl mb-2">🔥</div>
+                    <p>No tasks yet. Add some tasks to start building streaks!</p>
                   </div>
                 )}
               </div>
-            </div>
+            )}
+
+            {/* Manage Tasks Tab */}
+            {activeTab === 'manage' && (
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-white">Manage Tasks</h3>
+                  <button
+                    onClick={() => setShowAddTask(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-xl hover:bg-gray-200 transition-colors"
+                  >
+                    <Plus size={16} />
+                    Add Task
+                  </button>
+                </div>
+
+                {/* Task List */}
+                <div className="space-y-3">
+                  {tasks.map((task) => (
+                    <div
+                      key={task.task_id}
+                      className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{task.icon}</span>
+                        <div>
+                          <h4 className="font-medium text-white">{task.name}</h4>
+                          {task.description && (
+                            <p className="text-sm text-white/60">{task.description}</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <button
+                        onClick={() => setShowDeleteConfirm(task)}
+                        className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+
+                  {tasks.length === 0 && (
+                    <div className="text-center py-8 text-white/60">
+                      <div className="text-4xl mb-2">📝</div>
+                      <p>No tasks yet. Add your first task to get started!</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Add Task Modal */}

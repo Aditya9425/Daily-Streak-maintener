@@ -21,26 +21,45 @@ export const AIProvider = ({ children }) => {
   const [dailyCoaching, setDailyCoaching] = useState(null)
   const [weeklyReview, setWeeklyReview] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [lastCoachingDate, setLastCoachingDate] = useState(null)
 
   useEffect(() => {
     if (user && tasks.length > 0) {
-      // Only load if database tables exist, with longer delay to prevent rate limiting
-      const checkAndLoad = async () => {
+      const today = getTodayString()
+      
+      // Always try to load/generate coaching for today
+      const initializeAI = async () => {
         try {
+          // Check if AI tables exist
           await supabase.from('ai_daily_coaching').select('id').limit(1)
-          // Stagger the calls to avoid rate limiting
-          setTimeout(() => loadDailyCoaching(), 1000)
-          setTimeout(() => loadWeeklyReview(), 3000)
+          
+          // Load or generate daily coaching
+          await loadDailyCoaching()
+          
+          // Load weekly review with delay
+          setTimeout(() => loadWeeklyReview(), 2000)
         } catch (error) {
-          console.log('AI tables not yet created - skipping AI features')
+          console.log('AI tables not available - AI features disabled')
+          // Set fallback coaching message
+          setDailyCoaching({
+            message: "Keep pushing forward! Every small step counts toward your goals.",
+            action_suggestion: "Focus on completing at least one task today.",
+            date: today
+          })
         }
       }
-      checkAndLoad()
+      
+      initializeAI()
     }
   }, [user, tasks])
 
   const loadDailyCoaching = async () => {
     const today = getTodayString()
+    
+    // Don't reload if we already have coaching for today
+    if (dailyCoaching && dailyCoaching.date === today) {
+      return
+    }
     
     try {
       // Check if coaching already exists for today
@@ -53,20 +72,40 @@ export const AIProvider = ({ children }) => {
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading daily coaching:', error)
+        // Set fallback message on error
+        setDailyCoaching({
+          message: "Stay focused on your goals today!",
+          action_suggestion: "Complete your most important task first.",
+          date: today
+        })
         return
       }
 
       if (existing) {
         setDailyCoaching(existing)
+        setLastCoachingDate(today)
         return
       }
 
-      // Generate new coaching only if no existing data
+      // Generate new coaching only if no existing data and we have tasks
       if (tasks.length > 0) {
         await generateDailyCoaching()
+      } else {
+        // Fallback for no tasks
+        setDailyCoaching({
+          message: "Ready to start your journey? Add some tasks to track!",
+          action_suggestion: "Set up your first daily habit to begin building streaks.",
+          date: today
+        })
       }
     } catch (error) {
       console.error('Error loading daily coaching:', error)
+      // Always provide fallback coaching
+      setDailyCoaching({
+        message: "Every day is a new opportunity to grow!",
+        action_suggestion: "Take one small step toward your goals today.",
+        date: today
+      })
     }
   }
 

@@ -1,8 +1,10 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import { supabase } from '../utils/supabase'
 import { useAuth } from './AuthContext'
 import { PREDEFINED_TASKS } from '../utils/tasks'
-import { getTodayString, calculateStreak, isNewDay, getDateRange } from '../utils/dateUtils'
+import { getTodayString, calculateStreak, isNewDay, getDateRange, isISTMidnight } from '../utils/dateUtils'
+import { midnightResetService } from '../services/midnightReset'
+import { createAnalyticsService } from '../services/analytics'
 
 const TasksContext = createContext({})
 
@@ -22,23 +24,7 @@ export const TasksProvider = ({ children }) => {
   const [streakProtection, setStreakProtection] = useState(null)
   const [loading, setLoading] = useState(true)
   const [lastCheckDate, setLastCheckDate] = useState(null)
-
-  useEffect(() => {
-    if (user) {
-      initializeUserData()
-    } else {
-      resetState()
-    }
-  }, [user])
-
-  // Check for new day and reset daily states
-  useEffect(() => {
-    if (user && isNewDay(lastCheckDate)) {
-      setLastCheckDate(getTodayString())
-      // Reset weekly streak protection if needed
-      resetWeeklyStreakProtection()
-    }
-  }, [user, lastCheckDate])
+  const [selectedDate, setSelectedDate] = useState(getTodayString()) // New state for selected date
 
   const resetState = () => {
     setTasks([])
@@ -47,21 +33,6 @@ export const TasksProvider = ({ children }) => {
     setStreakProtection(null)
     setLoading(false)
     setLastCheckDate(null)
-  }
-
-  const initializeUserData = async () => {
-    try {
-      await Promise.all([
-        initializeTasks(),
-        fetchTaskLogs(),
-        fetchStreakData(),
-        initializeStreakProtection()
-      ])
-    } catch (error) {
-      console.error('Error initializing user data:', error)
-    } finally {
-      setLoading(false)
-    }
   }
 
   const initializeTasks = async () => {
@@ -139,6 +110,85 @@ export const TasksProvider = ({ children }) => {
     }
   }
 
+  const initializeUserData = useCallback(async () => {
+    if (!user) return
+    
+    try {
+      await Promise.all([
+        initializeTasks(),
+        fetchTaskLogs(),
+        fetchStreakData(),
+        initializeStreakProtection()
+      ])
+    } catch (error) {
+      console.error('Error initializing user data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (user) {
+      initializeUserData()
+    } else {
+      resetState()
+    }
+  }, [user, initializeUserData])
+
+  // Check for new day and reset daily states
+  useEffect(() => {
+    if (!user) return
+
+    const checkMidnightReset = async () => {
+      const today = getTodayString()
+      if (isNewDay(lastCheckDate)) {
+        setLastCheckDate(today)
+        
+        // Perform midnight reset
+        if (midnightResetService.shouldPerformReset()) {
+          await midnightResetService.performMidnightReset(user.id)
+        }
+        
+        // Refresh all data to ensure consistency
+        await initializeUserData()
+      }
+    }
+
+    // Check immediately
+    checkMidnightReset()
+
+    // Set up interval to check every minute for midnight reset
+    const interval = setInterval(checkMidnightReset, 60000)
+
+    return () => clearInterval(interval)
+  }, [user, lastCheckDate, initializeUserData])
+
+  const getTaskStatus = (taskId) => {
+    const todayLog = taskLogs.find(
+      log => log.task_id === taskId && log.date === selectedDate
+    )
+    return todayLog?.completed || false
+  }
+
+  const getTaskStreak = (taskId) => {
+    const taskStreakData = streakData.find(s => s.task_id === taskId)
+    if (taskStreakData) {
+      return {
+        current: taskStreakData.current_streak,
+        longest: taskStreakData.longest_streak
+      }
+    }
+    
+    // Fallback to calculation from logs
+    const logs = taskLogs.filter(log => log.task_id === taskId)
+    return calculateStreak(logs)
+  }
+
+  // Create analytics service with current data
+  const analyticsService = useMemo(() => {
+    return createAnalyticsService(tasks, taskLogs, getTaskStreak, selectedDate)
+  }, [tasks, taskLogs, streakData, selectedDate])
+
   const resetWeeklyStreakProtection = async () => {
     try {
       const { error } = await supabase.rpc('reset_weekly_streak_protection')
@@ -154,6 +204,12 @@ export const TasksProvider = ({ children }) => {
   const toggleTask = async (taskId) => {
     const today = getTodayString()
     
+    // Only allow toggling for today's date
+    if (selectedDate !== today) {
+      console.log('Cannot modify tasks for past dates')
+      return
+    }
+    
     try {
       // Check if task is already completed today
       const existingLog = taskLogs.find(
@@ -166,14 +222,18 @@ export const TasksProvider = ({ children }) => {
         newCompleted = !existingLog.completed
         const { error } = await supabase
           .from('task_logs')
-          .update({ completed: newCompleted })
+          .update({ 
+            completed: newCompleted,
+            updated_at: new Date().toISOString()
+          })
           .eq('id', existingLog.id)
 
         if (error) throw error
 
+        // Update local state immediately for better UX
         setTaskLogs(prev => prev.map(log => 
           log.id === existingLog.id 
-            ? { ...log, completed: newCompleted }
+            ? { ...log, completed: newCompleted, updated_at: new Date().toISOString() }
             : log
         ))
       } else {
@@ -197,6 +257,8 @@ export const TasksProvider = ({ children }) => {
       
     } catch (error) {
       console.error('Error toggling task:', error)
+      // Revert local state on error
+      await fetchTaskLogs()
     }
   }
 
@@ -268,32 +330,9 @@ export const TasksProvider = ({ children }) => {
     }
   }
 
-  const getTaskStatus = (taskId) => {
-    const today = getTodayString()
-    const todayLog = taskLogs.find(
-      log => log.task_id === taskId && log.date === today
-    )
-    return todayLog?.completed || false
-  }
-
-  const getTaskStreak = (taskId) => {
-    const taskStreakData = streakData.find(s => s.task_id === taskId)
-    if (taskStreakData) {
-      return {
-        current: taskStreakData.current_streak,
-        longest: taskStreakData.longest_streak
-      }
-    }
-    
-    // Fallback to calculation from logs
-    const logs = taskLogs.filter(log => log.task_id === taskId)
-    return calculateStreak(logs)
-  }
-
   const getDailyProgress = () => {
-    const today = getTodayString()
-    const todayLogs = taskLogs.filter(log => log.date === today && log.completed)
-    return Math.round((todayLogs.length / tasks.length) * 100) || 0
+    const selectedDateLogs = taskLogs.filter(log => log.date === selectedDate && log.completed)
+    return Math.round((selectedDateLogs.length / tasks.length) * 100) || 0
   }
 
   const getHistoryData = (days = 7) => {
@@ -338,6 +377,9 @@ export const TasksProvider = ({ children }) => {
     streakData,
     streakProtection,
     loading,
+    selectedDate,
+    setSelectedDate,
+    analyticsService,
     toggleTask,
     addCustomTask,
     deleteTask,

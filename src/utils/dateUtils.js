@@ -1,36 +1,57 @@
 import { format, isToday, isYesterday, startOfDay, differenceInDays, subDays, parseISO } from 'date-fns'
 
-// Get user's timezone offset
-export const getUserTimezoneOffset = () => {
-  return new Date().getTimezoneOffset()
-}
+// IST timezone offset (UTC+5:30)
+const IST_OFFSET_MINUTES = 330
 
-// Get today's date string in user's local timezone
-export const getTodayString = () => {
+// Get current IST time
+export const getISTTime = () => {
   const now = new Date()
-  return format(now, 'yyyy-MM-dd')
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000)
+  return new Date(utc + (IST_OFFSET_MINUTES * 60000))
 }
 
-// Get yesterday's date string in user's local timezone
+// Get today's date string in IST timezone
+export const getTodayString = () => {
+  const istTime = getISTTime()
+  return format(istTime, 'yyyy-MM-dd')
+}
+
+// Get yesterday's date string in IST timezone
 export const getYesterdayString = () => {
-  const yesterday = subDays(new Date(), 1)
+  const istTime = getISTTime()
+  const yesterday = subDays(istTime, 1)
   return format(yesterday, 'yyyy-MM-dd')
+}
+
+// Check if it's midnight in IST (for reset logic)
+export const isISTMidnight = () => {
+  const istTime = getISTTime()
+  const hours = istTime.getHours()
+  const minutes = istTime.getMinutes()
+  return hours === 0 && minutes === 0
 }
 
 // Format date
 export const formatDate = (date) => format(date, 'yyyy-MM-dd')
 
-export const isDateToday = (date) => isToday(new Date(date))
+export const isDateToday = (date) => {
+  const istTime = getISTTime()
+  const dateToCheck = parseISO(date)
+  return format(istTime, 'yyyy-MM-dd') === format(dateToCheck, 'yyyy-MM-dd')
+}
 
-export const isDateYesterday = (date) => isYesterday(new Date(date))
+export const isDateYesterday = (date) => {
+  const yesterday = getYesterdayString()
+  return date === yesterday
+}
 
-// Get date range for history view
+// Get date range for history view (in IST)
 export const getDateRange = (days) => {
   const dates = []
-  const today = new Date()
+  const istTime = getISTTime()
   
   for (let i = days - 1; i >= 0; i--) {
-    const date = subDays(today, i)
+    const date = subDays(istTime, i)
     dates.push(format(date, 'yyyy-MM-dd'))
   }
   

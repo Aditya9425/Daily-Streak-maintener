@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { TasksProvider } from './context/TasksContext'
+import { AIProvider } from './context/AIContext'
 import Auth from './pages/Auth'
 import DashboardClean from './pages/DashboardClean'
 import EmailVerification from './pages/EmailVerification'
