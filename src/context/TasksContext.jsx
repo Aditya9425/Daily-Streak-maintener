@@ -206,7 +206,6 @@ export const TasksProvider = ({ children }) => {
     
     // Only allow toggling for today's date
     if (selectedDate !== today) {
-      console.log('Cannot modify tasks for past dates')
       return
     }
     

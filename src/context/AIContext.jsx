@@ -39,7 +39,6 @@ export const AIProvider = ({ children }) => {
           // Load weekly review with delay
           setTimeout(() => loadWeeklyReview(), 2000)
         } catch (error) {
-          console.log('AI tables not available - AI features disabled')
           // Set fallback coaching message
           setDailyCoaching({
             message: "Keep pushing forward! Every small step counts toward your goals.",
