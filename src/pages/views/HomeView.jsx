@@ -48,6 +48,8 @@ const HomeView = () => {
     return 'Working late?'
   }
 
+  const username = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'
+
   return (
     <div className="p-4 md:p-8 max-w-xl mx-auto">
       <motion.div
@@ -57,7 +59,7 @@ const HomeView = () => {
       >
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2 flex-wrap">
-            {getGreeting()}, <span className="text-white/90">{user?.email?.split('@')[0]}</span>
+            {getGreeting()}, <span className="text-white/90">{username}</span>
             <span className="inline-block origin-bottom-right animate-wave text-2xl">👋</span>
           </h1>
           

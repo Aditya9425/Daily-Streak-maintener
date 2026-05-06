@@ -64,6 +64,8 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = async () => {
     try {
+      // Force clear local state immediately so UI redirects
+      setUser(null)
       const { error } = await supabase.auth.signOut()
       return { error }
     } catch (err) {
@@ -72,11 +74,27 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const signInWithGoogle = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
+        }
+      })
+      return { data, error }
+    } catch (err) {
+      console.error('Google SignIn error:', err)
+      return { data: null, error: { message: 'Connection error. Please try again.' } }
+    }
+  }
+
   const value = {
     user,
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
   }
 

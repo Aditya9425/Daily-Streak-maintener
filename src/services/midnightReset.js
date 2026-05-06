@@ -20,8 +20,8 @@ class MidnightResetService {
     try {
       console.log('Performing midnight reset for user:', userId)
       
-      // 1. Reset weekly streak protection if needed
-      await this.resetWeeklyStreakProtection(userId)
+      // 1. Reset weekly streak protection if needed (Requires Supabase RPC setup)
+      // await this.resetWeeklyStreakProtection(userId)
       
       // 2. Update streak data for missed tasks
       await this.updateStreaksForMissedTasks(userId)

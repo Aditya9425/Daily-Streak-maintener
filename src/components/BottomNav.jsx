@@ -47,7 +47,7 @@ const BottomNav = ({ onOpenAddTask }) => {
   ]
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 md:pb-6 flex justify-center pointer-events-none w-full max-w-[100vw] overflow-hidden md:overflow-visible">
+    <div className="fixed bottom-0 left-0 right-0 z-40 md:pb-6 flex justify-center pointer-events-none w-full max-w-[100vw]">
       <div className="bg-[#15171E]/95 backdrop-blur-md border-t border-white/5 md:border md:rounded-3xl w-full max-w-[420px] flex items-center px-2 pt-3 pb-8 md:pb-3 shadow-[0_-5px_30px_rgba(0,0,0,0.3)] pointer-events-auto relative mx-auto">
         
         {/* Navigation Items Wrapper */}

@@ -34,8 +34,9 @@ const ProfileView = () => {
     return { current, longest, total, rate }
   }, [taskLogs, tasks, analyticsService])
 
-  const username = user?.email?.split('@')[0] || 'User'
-  const initial = user?.email?.charAt(0).toUpperCase() || 'U'
+  const username = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'
+  const initial = username.charAt(0).toUpperCase()
+  const avatarUrl = user?.user_metadata?.avatar_url
 
   const SettingRow = ({ icon: Icon, title, subtitle, colorClass = "text-white/60", onClick }) => (
     <button 
@@ -73,9 +74,17 @@ const ProfileView = () => {
         <div className="flex items-center gap-4">
           <div className="relative">
             <div className="absolute inset-0 bg-[#FF8A00] blur-xl opacity-20 rounded-full" />
-            <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-[#2A2D3A] to-[#1C1F2A] border border-white/10 flex items-center justify-center text-xl font-bold text-white shadow-xl">
-              {initial}
-            </div>
+            {avatarUrl ? (
+              <img 
+                src={avatarUrl} 
+                alt={username} 
+                className="relative w-16 h-16 rounded-full border border-white/10 shadow-xl object-cover"
+              />
+            ) : (
+              <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-[#2A2D3A] to-[#1C1F2A] border border-white/10 flex items-center justify-center text-xl font-bold text-white shadow-xl">
+                {initial}
+              </div>
+            )}
           </div>
           <div>
             <h1 className="text-xl font-bold text-white mb-0.5">{username}</h1>
