@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { SettingsProvider } from './context/SettingsContext'
 import Auth from './pages/Auth'
 import EmailVerification from './pages/EmailVerification'
 import LoadingSpinner from './components/LoadingSpinner'
@@ -40,7 +41,8 @@ const PublicRoute = ({ children }) => {
 function App() {
   return (
     <AuthProvider>
-      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <SettingsProvider>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <div className="min-h-screen bg-[#0B0C10] text-white">
           <Routes>
             <Route 
@@ -69,6 +71,7 @@ function App() {
           </Routes>
         </div>
       </Router>
+      </SettingsProvider>
     </AuthProvider>
   )
 }
