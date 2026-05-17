@@ -1,13 +1,11 @@
 import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, TrendingUp, Calendar as CalendarIcon, ChevronDown, ChevronUp } from 'lucide-react'
+import { Sparkles, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react'
 import { useTasks } from '../../context/TasksContext'
-import CalendarModal from '../../components/CalendarModal'
 import { DynamicIcon } from '../../utils/iconUtils'
 
 const StatsView = () => {
   const { taskLogs, analyticsService, tasks } = useTasks()
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('Overview')
   const [showWeeklyReview, setShowWeeklyReview] = useState(false)
 
@@ -216,12 +214,6 @@ const StatsView = () => {
       {/* Premium Header */}
       <div className="flex items-center justify-between mb-8 mt-2">
         <h1 className="text-2xl font-bold text-white">Analytics</h1>
-        <button 
-          onClick={() => setIsCalendarOpen(true)}
-          className="p-3 rounded-2xl bg-[#1C1F2A] border border-white/5 text-[#FF8A00] hover:bg-white/5 transition-all shadow-lg drop-shadow-[0_0_10px_rgba(255,138,0,0.2)]"
-        >
-          <CalendarIcon size={20} />
-        </button>
       </div>
 
       {/* AI Insights Block (Always visible at top) */}
@@ -299,8 +291,6 @@ const StatsView = () => {
 
       {/* Tab Content */}
       {renderTabContent()}
-
-      <CalendarModal isOpen={isCalendarOpen} onClose={() => setIsCalendarOpen(false)} />
     </div>
   )
 }

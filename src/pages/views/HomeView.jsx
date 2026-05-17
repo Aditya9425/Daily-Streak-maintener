@@ -1,11 +1,12 @@
 import { useMemo, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { format, parseISO } from 'date-fns'
-import { Flame } from 'lucide-react'
+import { Flame, CalendarDays } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useTasks } from '../../context/TasksContext'
 import TaskCardClean from '../../components/TaskCardClean'
 import TodayTasksSection from '../../components/TodayTasks/TodayTasksSection'
+import CalendarModal from '../../components/CalendarModal'
 import { getTodayString, getDateRange, calculateStreak } from '../../utils/dateUtils'
 
 const GreetingHeader = ({ username, isViewingToday, selectedDate }) => {
@@ -70,6 +71,7 @@ const GreetingHeader = ({ username, isViewingToday, selectedDate }) => {
 const HomeView = () => {
   const { user } = useAuth()
   const { tasks, taskLogs, selectedDate } = useTasks()
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
   
   const today = getTodayString()
   const isViewingToday = selectedDate === today
@@ -107,9 +109,18 @@ const HomeView = () => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-start justify-between mb-8 mt-2"
+        className="flex items-start justify-between mb-8 mt-2 gap-4"
       >
         <GreetingHeader username={username} isViewingToday={isViewingToday} selectedDate={selectedDate} />
+        
+        <motion.button
+          onClick={() => setIsCalendarOpen(true)}
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center justify-center flex-shrink-0 w-[52px] h-[52px] md:w-[56px] md:h-[56px] rounded-full bg-[#1A1D28]/90 border border-white/5 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.4)] drop-shadow-[0_0_10px_rgba(255,157,47,0.15)] hover:drop-shadow-[0_0_15px_rgba(255,157,47,0.3)] transition-all duration-300"
+        >
+          <CalendarDays size={22} className="text-[#FF9D2F] md:w-6 md:h-6" />
+        </motion.button>
       </motion.div>
 
       <motion.div
@@ -210,6 +221,7 @@ const HomeView = () => {
       {/* NEW: Today's Tasks Section */}
       <TodayTasksSection />
 
+      <CalendarModal isOpen={isCalendarOpen} onClose={() => setIsCalendarOpen(false)} />
     </div>
   )
 }
