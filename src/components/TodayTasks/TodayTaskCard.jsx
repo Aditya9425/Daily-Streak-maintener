@@ -1,10 +1,11 @@
+import { forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Clock } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { getCategoryDetails } from './taskCategories';
 import { DynamicIcon } from '../../utils/iconUtils';
 
-const TodayTaskCard = ({ task, onClick, onToggleStatus }) => {
+const TodayTaskCard = forwardRef(({ task, onClick, onToggleStatus }, ref) => {
   const isCompleted = task.status === 'completed';
   const categoryDetails = getCategoryDetails(task.category);
 
@@ -21,6 +22,7 @@ const TodayTaskCard = ({ task, onClick, onToggleStatus }) => {
 
   return (
     <motion.div
+      ref={ref}
       layout
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
@@ -114,6 +116,8 @@ const TodayTaskCard = ({ task, onClick, onToggleStatus }) => {
       </div>
     </motion.div>
   );
-};
+});
+
+TodayTaskCard.displayName = 'TodayTaskCard';
 
 export default TodayTaskCard;

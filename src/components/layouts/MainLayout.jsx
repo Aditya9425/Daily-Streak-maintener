@@ -6,6 +6,7 @@ import ActionSheetModal from '../TodayTasks/ActionSheetModal'
 import { TasksProvider } from '../../context/TasksContext'
 import { AIProvider } from '../../context/AIContext'
 import { TodayTasksProvider } from '../../context/TodayTasksContext'
+import { TodayThoughtsProvider } from '../../context/TodayThoughtsContext'
 
 const MainLayoutContent = () => {
   const [showActionSheet, setShowActionSheet] = useState(false)
@@ -32,9 +33,11 @@ const MainLayout = () => {
   return (
     <TasksProvider>
       <TodayTasksProvider>
-        <AIProvider>
-          <MainLayoutContent />
-        </AIProvider>
+        <TodayThoughtsProvider>
+          <AIProvider>
+            <MainLayoutContent />
+          </AIProvider>
+        </TodayThoughtsProvider>
       </TodayTasksProvider>
     </TasksProvider>
   )
