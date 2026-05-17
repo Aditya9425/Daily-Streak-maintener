@@ -77,7 +77,8 @@ export const getIconForTask = (name, providedIcon) => {
 export const DynamicIcon = ({ iconName, size = 24, className = "" }) => {
   let nameToRender = iconName;
   
-  if (!PREMIUM_ICONS.includes(iconName) && typeof iconName === 'string') {
+  // If it's a string but NOT a valid Lucide component name, it might be an emoji
+  if (typeof iconName === 'string' && !LucideIcons[iconName]) {
     nameToRender = EMOJI_TO_LUCIDE[iconName] || 'CheckCircle';
   }
 

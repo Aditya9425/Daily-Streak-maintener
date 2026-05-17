@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { 
-  LogOut, Shield, Settings2, Bell, 
+import {
+  LogOut, Shield, Settings2, Bell,
   Palette, MessageSquare, Info, ChevronRight,
   Flame, Trophy, Target, Activity
 } from 'lucide-react'
@@ -39,7 +39,7 @@ const ProfileView = () => {
   const avatarUrl = user?.user_metadata?.avatar_url
 
   const SettingRow = ({ icon: Icon, title, subtitle, colorClass = "text-white/60", onClick }) => (
-    <button 
+    <button
       onClick={onClick}
       className="w-full flex items-center justify-between p-4 bg-[#1C1F2A] border border-white/5 rounded-2xl hover:bg-white/5 transition-all group active:scale-[0.98]"
     >
@@ -64,7 +64,7 @@ const ProfileView = () => {
 
   return (
     <div className="p-4 md:p-8 max-w-xl mx-auto pb-32 space-y-8">
-      
+
       {/* Header Profile Identity */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -75,9 +75,9 @@ const ProfileView = () => {
           <div className="relative">
             <div className="absolute inset-0 bg-[#FF8A00] blur-xl opacity-20 rounded-full" />
             {avatarUrl ? (
-              <img 
-                src={avatarUrl} 
-                alt={username} 
+              <img
+                src={avatarUrl}
+                alt={username}
                 className="relative w-16 h-16 rounded-full border border-white/10 shadow-xl object-cover"
               />
             ) : (
@@ -134,22 +134,22 @@ const ProfileView = () => {
         <div>
           <SectionLabel text="App Experience" />
           <div className="space-y-2">
-            <SettingRow 
-              icon={Settings2} 
-              title="Theme & Display" 
-              subtitle="Dark mode, compact view" 
+            <SettingRow
+              icon={Settings2}
+              title="Theme & Display"
+              subtitle="Dark mode, compact view"
               colorClass="text-purple-400"
             />
-            <SettingRow 
-              icon={Palette} 
-              title="Accent Color" 
-              subtitle="Choose your primary color" 
+            <SettingRow
+              icon={Palette}
+              title="Accent Color"
+              subtitle="Choose your primary color"
               colorClass="text-pink-400"
             />
-            <SettingRow 
-              icon={Bell} 
-              title="Notifications" 
-              subtitle="Reminders, streak alerts" 
+            <SettingRow
+              icon={Bell}
+              title="Notifications"
+              subtitle="Reminders, streak alerts"
               colorClass="text-[#FF8A00]"
             />
           </div>
@@ -159,10 +159,10 @@ const ProfileView = () => {
         <div>
           <SectionLabel text="Account" />
           <div className="space-y-2">
-            <SettingRow 
-              icon={Shield} 
-              title="Privacy & Security" 
-              subtitle="Password, active sessions" 
+            <SettingRow
+              icon={Shield}
+              title="Privacy & Security"
+              subtitle="Password, active sessions"
               colorClass="text-green-400"
             />
           </div>
@@ -172,16 +172,16 @@ const ProfileView = () => {
         <div>
           <SectionLabel text="Support" />
           <div className="space-y-2">
-            <SettingRow 
-              icon={MessageSquare} 
-              title="Feedback" 
-              subtitle="Share your thoughts with us" 
+            <SettingRow
+              icon={MessageSquare}
+              title="Feedback"
+              subtitle="Share your thoughts with us"
               colorClass="text-blue-400"
             />
-            <SettingRow 
-              icon={Info} 
-              title="About the App" 
-              subtitle="Version, terms and more" 
+            <SettingRow
+              icon={Info}
+              title="About the App"
+              subtitle="Version, terms and more"
               colorClass="text-white/60"
             />
           </div>
@@ -189,7 +189,7 @@ const ProfileView = () => {
 
         {/* Logout */}
         <div className="pt-4 pb-12">
-          <button 
+          <button
             onClick={signOut}
             className="w-full flex items-center justify-center gap-3 p-4 bg-[#1C1F2A] border border-red-500/10 rounded-2xl hover:bg-red-500/5 transition-all group active:scale-[0.98] shadow-lg"
           >

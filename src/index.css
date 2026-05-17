@@ -9,28 +9,29 @@
 }
 
 @layer components {
+
   /* Consistent card styling */
   .card {
     @apply bg-[#15171E] border border-white/5 rounded-2xl;
   }
-  
+
   .card-hover {
     @apply hover:bg-[#1A1C24] transition-all duration-300;
   }
-  
+
   .card-padding {
     @apply p-6;
   }
-  
+
   /* Remove old glass classes for consistency */
   .glass {
     @apply bg-[#15171E] border border-white/5;
   }
-  
+
   .glass-hover {
     @apply hover:bg-[#1A1C24] transition-all duration-300;
   }
-  
+
   .glass-card {
     @apply glass rounded-2xl p-6;
   }

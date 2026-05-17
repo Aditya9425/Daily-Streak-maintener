@@ -1,11 +1,71 @@
-import { useMemo } from 'react'
-import { motion } from 'framer-motion'
+import { useMemo, useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { format, parseISO } from 'date-fns'
 import { Flame } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useTasks } from '../../context/TasksContext'
 import TaskCardClean from '../../components/TaskCardClean'
+import TodayTasksSection from '../../components/TodayTasks/TodayTasksSection'
 import { getTodayString, getDateRange, calculateStreak } from '../../utils/dateUtils'
+
+const GreetingHeader = ({ username, isViewingToday, selectedDate }) => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    // Update every 10 seconds to ensure the minute changes smoothly without heavy rendering
+    const timer = setInterval(() => {
+      setTime(new Date());
+    }, 10000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const getGreeting = (hour) => {
+    if (hour >= 5 && hour < 12) return 'Good morning';
+    if (hour >= 12 && hour < 17) return 'Good afternoon';
+    if (hour >= 17 && hour < 21) return 'Good evening';
+    return 'Good night';
+  };
+
+  const hour = time.getHours();
+  const greeting = getGreeting(hour);
+  
+  const formattedDate = format(time, 'EEEE, d MMM');
+  const formattedTime = format(time, 'h:mm a');
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2 flex-wrap tracking-tight">
+        {greeting}, <span className="text-white/90">{username}</span>
+        <span className="inline-block origin-bottom-right animate-wave text-2xl">👋</span>
+      </h1>
+      
+      <AnimatePresence mode="wait">
+        <motion.div 
+          key={formattedTime}
+          initial={{ opacity: 0, filter: 'blur(2px)' }}
+          animate={{ opacity: 1, filter: 'blur(0px)' }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-white/50 text-sm tracking-wide font-medium"
+        >
+          {formattedDate} &bull; {formattedTime}
+        </motion.div>
+      </AnimatePresence>
+      
+      <div className="mt-1">
+        {isViewingToday ? (
+          <p className="text-white/50 text-sm">Let's keep your streak alive.</p>
+        ) : (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/60 text-xs font-medium w-fit shadow-sm">
+            <svg className="w-3.5 h-3.5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Viewing activity from {format(parseISO(selectedDate), 'MMMM d')}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const HomeView = () => {
   const { user } = useAuth()
@@ -40,14 +100,6 @@ const HomeView = () => {
   const totalTasks = tasks?.length || 0
   const completionPercentage = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0
 
-  const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 12) return 'Good morning'
-    if (hour < 17) return 'Good afternoon'
-    if (hour < 22) return 'Good evening'
-    return 'Working late?'
-  }
-
   const username = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User'
 
   return (
@@ -57,23 +109,7 @@ const HomeView = () => {
         animate={{ opacity: 1, y: 0 }}
         className="flex items-start justify-between mb-8 mt-2"
       >
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2 flex-wrap">
-            {getGreeting()}, <span className="text-white/90">{username}</span>
-            <span className="inline-block origin-bottom-right animate-wave text-2xl">👋</span>
-          </h1>
-          
-          {isViewingToday ? (
-            <p className="text-white/50 text-sm">Let's keep your streak alive.</p>
-          ) : (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/60 text-xs font-medium w-fit mt-1 shadow-sm">
-              <svg className="w-3.5 h-3.5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Viewing activity from {format(parseISO(selectedDate), 'MMMM d')}
-            </div>
-          )}
-        </div>
+        <GreetingHeader username={username} isViewingToday={isViewingToday} selectedDate={selectedDate} />
       </motion.div>
 
       <motion.div
@@ -148,7 +184,7 @@ const HomeView = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="space-y-3"
+        className="space-y-3 mb-8"
       >
         {tasks.map((task, index) => (
           <TaskCardClean 
@@ -163,13 +199,17 @@ const HomeView = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-center py-12 bg-[#15171E] rounded-3xl border border-white/5 mt-6"
+          className="text-center py-12 bg-[#15171E] rounded-3xl border border-white/5 mb-8"
         >
           <div className="text-4xl mb-3">🎯</div>
           <h3 className="text-lg font-medium text-white mb-1">No tasks yet</h3>
           <p className="text-white/40 text-sm">Create your first task to start tracking streaks</p>
         </motion.div>
       )}
+
+      {/* NEW: Today's Tasks Section */}
+      <TodayTasksSection />
+
     </div>
   )
 }

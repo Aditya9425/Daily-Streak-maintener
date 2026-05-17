@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useRef } from 'react'
 import { supabase } from '../utils/supabase'
 import { useAuth } from './AuthContext'
 import { useTasks } from './TasksContext'
@@ -22,6 +22,7 @@ export const AIProvider = ({ children }) => {
   const [weeklyReview, setWeeklyReview] = useState(null)
   const [loading, setLoading] = useState(false)
   const [lastCoachingDate, setLastCoachingDate] = useState(null)
+  const isGeneratingRef = useRef(false)
 
   useEffect(() => {
     if (user && tasks.length > 0) {
@@ -109,8 +110,9 @@ export const AIProvider = ({ children }) => {
   }
 
   const generateDailyCoaching = async () => {
-    if (!user || tasks.length === 0) return
+    if (!user || tasks.length === 0 || isGeneratingRef.current) return
 
+    isGeneratingRef.current = true
     setLoading(true)
     try {
       const userStats = getUserStats()
@@ -132,13 +134,31 @@ export const AIProvider = ({ children }) => {
           .select()
           .single()
 
-        if (error) throw error
-        setDailyCoaching(data)
+        if (error) {
+          if (error.code === '23505') {
+            console.log('Daily coaching already generated.')
+            // Try to fetch the generated coaching instead of throwing
+            const { data: existingData } = await supabase
+              .from('ai_daily_coaching')
+              .select('*')
+              .eq('user_id', user.id)
+              .eq('date', getTodayString())
+              .single()
+            if (existingData) {
+              setDailyCoaching(existingData)
+            }
+          } else {
+            throw error
+          }
+        } else {
+          setDailyCoaching(data)
+        }
       }
     } catch (error) {
       console.error('Error generating daily coaching:', error)
     } finally {
       setLoading(false)
+      isGeneratingRef.current = false
     }
   }
 

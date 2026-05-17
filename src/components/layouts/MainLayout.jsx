@@ -2,17 +2,28 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import BottomNav from '../BottomNav'
 import CustomTaskModal from '../CustomTaskModal'
+import ActionSheetModal from '../TodayTasks/ActionSheetModal'
 import { TasksProvider } from '../../context/TasksContext'
 import { AIProvider } from '../../context/AIContext'
+import { TodayTasksProvider } from '../../context/TodayTasksContext'
 
 const MainLayoutContent = () => {
-  const [showAddTask, setShowAddTask] = useState(false)
+  const [showActionSheet, setShowActionSheet] = useState(false)
+  const [showAddHabit, setShowAddHabit] = useState(false)
 
   return (
     <div className="min-h-screen bg-[#0B0C10] pb-28 text-white selection:bg-[#FF8A00]/30">
       <Outlet />
-      <BottomNav onOpenAddTask={() => setShowAddTask(true)} />
-      <CustomTaskModal isOpen={showAddTask} onClose={() => setShowAddTask(false)} />
+      <BottomNav onOpenAddTask={() => setShowActionSheet(true)} />
+      <ActionSheetModal 
+        isOpen={showActionSheet} 
+        onClose={() => setShowActionSheet(false)} 
+        onOpenAddHabit={() => {
+          setShowActionSheet(false);
+          setShowAddHabit(true);
+        }}
+      />
+      <CustomTaskModal isOpen={showAddHabit} onClose={() => setShowAddHabit(false)} />
     </div>
   )
 }
@@ -20,9 +31,11 @@ const MainLayoutContent = () => {
 const MainLayout = () => {
   return (
     <TasksProvider>
-      <AIProvider>
-        <MainLayoutContent />
-      </AIProvider>
+      <TodayTasksProvider>
+        <AIProvider>
+          <MainLayoutContent />
+        </AIProvider>
+      </TodayTasksProvider>
     </TasksProvider>
   )
 }
