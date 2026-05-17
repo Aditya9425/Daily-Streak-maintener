@@ -13,7 +13,7 @@ const MainLayoutContent = () => {
   const [showAddHabit, setShowAddHabit] = useState(false)
 
   return (
-    <div className="min-h-screen bg-[#0B0C10] pb-28 text-white selection:bg-[#FF8A00]/30">
+    <div className="min-h-screen bg-[#0B0C10] pb-24 text-white selection:bg-[#FF8A00]/30">
       <Outlet />
       <BottomNav onOpenAddTask={() => setShowActionSheet(true)} />
       <ActionSheetModal 

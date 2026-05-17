@@ -45,7 +45,7 @@ const AppearanceModal = ({ isOpen, onClose }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {THEMES.map(t => {
                 const isSelected = theme === t.id;
                 const Icon = t.icon;
@@ -55,7 +55,7 @@ const AppearanceModal = ({ isOpen, onClose }) => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setTheme(t.id)}
-                    className={`relative p-5 rounded-2xl flex flex-col items-center gap-3 transition-all duration-300 text-left border ${
+                    className={`relative p-3 sm:p-4 rounded-2xl flex flex-col items-center gap-2 sm:gap-3 transition-all duration-300 text-left border ${
                       isSelected 
                         ? 'bg-[#1C1F2A] border-[#FF8A00]/50 shadow-[0_0_20px_rgba(255,138,0,0.15)]' 
                         : 'bg-[#15171E] border-white/5 hover:bg-[#1A1D28] hover:border-white/10'
@@ -64,14 +64,14 @@ const AppearanceModal = ({ isOpen, onClose }) => {
                     {isSelected && (
                       <div className="absolute inset-0 bg-gradient-to-b from-[#FF8A00]/10 to-transparent rounded-2xl pointer-events-none" />
                     )}
-                    <div className={`p-3 rounded-xl ${isSelected ? 'bg-[#FF8A00]/10 text-[#FF8A00]' : 'bg-white/5 text-white/40'}`}>
-                      <Icon size={24} strokeWidth={isSelected ? 2.5 : 2} />
+                    <div className={`p-2.5 sm:p-3 rounded-xl ${isSelected ? 'bg-[#FF8A00]/10 text-[#FF8A00]' : 'bg-white/5 text-white/40'}`}>
+                      <Icon size={20} strokeWidth={isSelected ? 2.5 : 2} />
                     </div>
                     <div className="text-center">
-                      <span className={`block font-semibold ${isSelected ? 'text-[#FF8A00]' : 'text-white/80'}`}>
+                      <span className={`block text-xs sm:text-sm font-semibold ${isSelected ? 'text-[#FF8A00]' : 'text-white/80'}`}>
                         {t.label}
                       </span>
-                      <span className="block text-[10px] text-white/40 uppercase tracking-wider mt-1 font-medium">
+                      <span className="block text-[9px] sm:text-[10px] text-white/40 uppercase tracking-wider mt-0.5 font-medium">
                         {t.description}
                       </span>
                     </div>
@@ -80,7 +80,7 @@ const AppearanceModal = ({ isOpen, onClose }) => {
               })}
             </div>
             
-            <div className="mt-8 text-center">
+            <div className="mt-6 text-center">
               <p className="text-xs text-white/30 font-medium">
                 StreakWise maintains its premium matte cinematic identity across all themes.
               </p>

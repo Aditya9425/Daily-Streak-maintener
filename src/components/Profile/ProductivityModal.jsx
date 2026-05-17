@@ -60,54 +60,52 @@ const ProductivityModal = ({ isOpen, onClose }) => {
 
             <div className="space-y-3">
               {/* Focus Mode */}
-              <div className="bg-[#1C1F2A] border border-white/5 rounded-2xl p-4 sm:p-5 flex items-start justify-between gap-4">
-                <div className="flex gap-4">
-                  <div className="mt-0.5 p-2.5 bg-[#15171E] rounded-xl border border-white/5 text-purple-400">
-                    <Target size={20} />
+              <div className="bg-[#1C1F2A] border border-white/5 rounded-2xl p-4 sm:p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-[#15171E] rounded-xl border border-white/5 text-emerald-400">
+                      <Target size={18} />
+                    </div>
+                    <h3 className="text-white/90 font-semibold">Focus Mode</h3>
                   </div>
-                  <div>
-                    <h3 className="text-white/90 font-semibold mb-1">Focus Mode</h3>
-                    <p className="text-sm text-white/40 leading-relaxed">
-                      Reduces visual distractions and minimizes animations to keep you locked in.
-                    </p>
-                  </div>
+                  <Toggle 
+                    checked={productivity.focusMode} 
+                    onChange={() => updateProductivity({ focusMode: !productivity.focusMode })}
+                  />
                 </div>
-                <Toggle 
-                  checked={productivity.focusMode} 
-                  onChange={() => updateProductivity({ focusMode: !productivity.focusMode })}
-                />
+                <p className="text-[13px] text-white/40 leading-relaxed pl-1">
+                  Reduces visual distractions and minimizes animations to keep you locked in.
+                </p>
               </div>
 
               {/* Day Reset Time */}
               <div className="bg-[#1C1F2A] border border-white/5 rounded-2xl p-4 sm:p-5">
-                <div className="flex gap-4">
-                  <div className="mt-0.5 p-2.5 bg-[#15171E] rounded-xl border border-white/5 text-[#FF8A00]">
-                    <Clock size={20} />
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-[#15171E] rounded-xl border border-white/5 text-[#FF8A00]">
+                    <Clock size={18} />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-white/90 font-semibold mb-1">Day Reset Time</h3>
-                    <p className="text-sm text-white/40 leading-relaxed mb-4">
-                      When does your day actually end? Useful for night owls tracking consistency.
-                    </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {RESET_TIMES.map(time => {
-                        const isSelected = productivity.dayResetTime === time;
-                        return (
-                          <button
-                            key={time}
-                            onClick={() => updateProductivity({ dayResetTime: time })}
-                            className={`px-3 py-2 text-xs font-semibold rounded-xl transition-all border ${
-                              isSelected 
-                                ? 'bg-[#FF8A00]/10 border-[#FF8A00]/30 text-[#FF8A00]' 
-                                : 'bg-[#15171E] border-white/5 text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
-                          >
-                            {time}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
+                  <h3 className="text-white/90 font-semibold">Day Reset Time</h3>
+                </div>
+                <p className="text-[13px] text-white/40 leading-relaxed mb-4 pl-1">
+                  When does your day actually end? Useful for night owls tracking consistency.
+                </p>
+                <div className="grid grid-cols-5 gap-2">
+                  {RESET_TIMES.map(time => {
+                    const isSelected = productivity.dayResetTime === time;
+                    return (
+                      <button
+                        key={time}
+                        onClick={() => updateProductivity({ dayResetTime: time })}
+                        className={`py-2 text-[11px] font-semibold rounded-xl transition-all border text-center ${
+                          isSelected 
+                            ? 'bg-[#FF8A00]/10 border-[#FF8A00]/30 text-[#FF8A00]' 
+                            : 'bg-[#15171E] border-white/5 text-white/40 hover:text-white/80 hover:bg-white/5'
+                        }`}
+                      >
+                        {time.split(' ')[0]}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

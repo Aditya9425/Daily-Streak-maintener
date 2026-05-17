@@ -57,70 +57,67 @@ const NotificationsModal = ({ isOpen, onClose }) => {
             <div className="space-y-3">
               {/* Daily Reminder */}
               <div className="bg-[#1C1F2A] border border-white/5 rounded-2xl p-4 sm:p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex gap-4">
-                    <div className="mt-0.5 p-2.5 bg-[#15171E] rounded-xl border border-white/5 text-[#FF8A00]">
-                      <Bell size={20} />
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-[#15171E] rounded-xl border border-white/5 text-[#FF8A00]">
+                      <Bell size={18} />
                     </div>
-                    <div>
-                      <h3 className="text-white/90 font-semibold mb-1">Daily Reminder</h3>
-                      <p className="text-sm text-white/40 leading-relaxed mb-4">
-                        A gentle push to maintain your consistency.
-                      </p>
-                      <input 
-                        type="time" 
-                        value={notifications.reminderTime}
-                        onChange={(e) => updateNotifications({ reminderTime: e.target.value })}
-                        disabled={!notifications.dailyReminder}
-                        className="bg-[#15171E] border border-white/10 rounded-xl px-3 py-1.5 text-sm text-white/80 focus:outline-none focus:border-[#FF8A00]/50 disabled:opacity-50"
-                      />
-                    </div>
+                    <h3 className="text-white/90 font-semibold">Daily Reminder</h3>
                   </div>
                   <Toggle 
                     checked={notifications.dailyReminder} 
                     onChange={() => updateNotifications({ dailyReminder: !notifications.dailyReminder })}
                   />
                 </div>
+                <p className="text-[13px] text-white/40 leading-relaxed mb-3 pl-1">
+                  A gentle push to maintain your consistency.
+                </p>
+                <input 
+                  type="time" 
+                  value={notifications.reminderTime}
+                  onChange={(e) => updateNotifications({ reminderTime: e.target.value })}
+                  disabled={!notifications.dailyReminder}
+                  className="bg-[#15171E] border border-white/10 rounded-xl px-3 py-2 text-sm text-white/80 focus:outline-none focus:border-[#FF8A00]/50 disabled:opacity-50 w-full"
+                />
               </div>
 
               {/* Streak Warning */}
-              <div className="bg-[#1C1F2A] border border-white/5 rounded-2xl p-4 sm:p-5 flex items-start justify-between gap-4">
-                <div className="flex gap-4">
-                  <div className="mt-0.5 p-2.5 bg-[#15171E] rounded-xl border border-white/5 text-red-400">
-                    <Flame size={20} />
+              <div className="bg-[#1C1F2A] border border-white/5 rounded-2xl p-4 sm:p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-[#15171E] rounded-xl border border-white/5 text-red-400">
+                      <Flame size={18} />
+                    </div>
+                    <h3 className="text-white/90 font-semibold">Streak Warning</h3>
                   </div>
-                  <div>
-                    <h3 className="text-white/90 font-semibold mb-1">Streak Warning</h3>
-                    <p className="text-sm text-white/40 leading-relaxed">
-                      Alert me if I'm about to lose my current streak.
-                    </p>
-                  </div>
+                  <Toggle 
+                    checked={notifications.streakWarning} 
+                    onChange={() => updateNotifications({ streakWarning: !notifications.streakWarning })}
+                  />
                 </div>
-                <Toggle 
-                  checked={notifications.streakWarning} 
-                  onChange={() => updateNotifications({ streakWarning: !notifications.streakWarning })}
-                />
+                <p className="text-[13px] text-white/40 leading-relaxed pl-1">
+                  Alert me if I'm about to lose my current streak.
+                </p>
               </div>
 
               {/* Evening Reminder */}
-              <div className="bg-[#1C1F2A] border border-white/5 rounded-2xl p-4 sm:p-5 flex items-start justify-between gap-4">
-                <div className="flex gap-4">
-                  <div className="mt-0.5 p-2.5 bg-[#15171E] rounded-xl border border-white/5 text-blue-400">
-                    <Moon size={20} />
+              <div className="bg-[#1C1F2A] border border-white/5 rounded-2xl p-4 sm:p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-[#15171E] rounded-xl border border-white/5 text-blue-400">
+                      <Moon size={18} />
+                    </div>
+                    <h3 className="text-white/90 font-semibold">Evening Review</h3>
                   </div>
-                  <div>
-                    <h3 className="text-white/90 font-semibold mb-1">Evening Review</h3>
-                    <p className="text-sm text-white/40 leading-relaxed">
-                      Remind me to complete any unfinished tasks before bed.
-                    </p>
-                  </div>
+                  <Toggle 
+                    checked={notifications.eveningReminder} 
+                    onChange={() => updateNotifications({ eveningReminder: !notifications.eveningReminder })}
+                  />
                 </div>
-                <Toggle 
-                  checked={notifications.eveningReminder} 
-                  onChange={() => updateNotifications({ eveningReminder: !notifications.eveningReminder })}
-                />
+                <p className="text-[13px] text-white/40 leading-relaxed pl-1">
+                  Remind me to complete any unfinished tasks before bed.
+                </p>
               </div>
-
             </div>
           </div>
         </motion.div>
